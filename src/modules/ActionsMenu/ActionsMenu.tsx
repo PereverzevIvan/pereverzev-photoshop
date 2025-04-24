@@ -3,6 +3,8 @@ import { open_icon } from "../../assets/images/actions";
 import s from "./ActionsMenu.module.scss";
 import { ActionsGroup } from "./components/ActionList/ActionsGroup";
 import { ImageContext } from "../../contexts/ImageContext/ImageContext";
+import { detectImageFormat } from "../../contexts/ImageContext/ImageTypeGetter";
+import { getColorDepthOfImage } from "../../contexts/ImageContext/ColorDepthGetter";
 
 export function ActionsMenu() {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -12,12 +14,22 @@ export function ActionsMenu() {
     if (inputRef.current) inputRef.current.click();
   }
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (!event.target.files) {
       alert("Файл не загружен. Не переданы файлы");
       return;
     }
     const file = event.target.files[0];
+
+    try {
+      const imageColorDepth = await getColorDepthOfImage(file);
+      console.log(imageColorDepth);
+    } catch (e) {
+      alert(e);
+    }
+
+    return;
+
     if (file) {
       loadImage(file);
     }
