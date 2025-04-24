@@ -1,0 +1,24 @@
+@use "@/scss/globalStyles" as g;
+
+.actionItem {
+  @include g.h-flex-container(5px, start, center);
+  width: 100%;
+  cursor: pointer;
+  padding: 2px;
+  color: white;
+
+  &:hover {
+    background-color: white;
+    color: black;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    border: none;
+  }
+
+  .title {
+    @include g.collapse;
+  }
+}

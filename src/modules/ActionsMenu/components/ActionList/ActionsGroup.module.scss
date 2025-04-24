@@ -1,0 +1,42 @@
+@use "@/scss/globalStyles" as g;
+
+.actionsGroup {
+  @include g.h-flex-container(10px, start);
+  width: fit-content;
+  background-color: gray;
+  position: relative;
+
+  .title {
+    @include g.collapse;
+    padding: 2px 2px;
+    color: white;
+    &:hover,
+    &_active {
+      cursor: pointer;
+      background-color: white;
+      color: black;
+    }
+  }
+
+  .actionsList {
+    width: fit-content;
+    background-color: gray;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    list-style: none;
+    border: 1px solid black;
+    display: none;
+    max-width: 300px;
+
+    :not(:last-child) {
+      &:not(img) {
+        border-bottom: 1px solid black;
+      }
+    }
+
+    &_show {
+      @include g.v-flex-container();
+    }
+  }
+}

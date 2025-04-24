@@ -1,0 +1,16 @@
+@use "@/scss/globalStyles" as g;
+
+.canvasContainer {
+  @include g.v-flex-container(0px, center, center);
+  padding: 10px;
+  background-color: lightgray;
+  max-height: 100vh;
+}
+
+.canvas {
+  background-color: white;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 65vh;
+}

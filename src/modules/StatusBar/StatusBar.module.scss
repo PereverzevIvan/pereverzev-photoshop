@@ -1,0 +1,24 @@
+@use "@/scss/globalStyles" as g;
+
+.statusBar {
+  @include g.h-flex-container(20px, start, center);
+  @include g.status-bar-text;
+  width: 100%;
+  color: white;
+  height: 30px;
+  background-color: gray;
+  padding: 10px 10px;
+
+  .property {
+    @include g.collapse();
+    @include g.h-flex-container(2px, flex-start, center);
+
+    .propertyName {
+      @include g.collapse();
+      font-weight: bold;
+    }
+    .propertyValue {
+      @include g.collapse();
+    }
+  }
+}

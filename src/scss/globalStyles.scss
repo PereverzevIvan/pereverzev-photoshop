@@ -1,0 +1,40 @@
+@mixin h-flex-container($gap: 0px, $justify: start, $align: start) {
+  display: flex;
+  gap: $gap;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+@mixin v-flex-container($gap: 0px, $justify: start, $align: start) {
+  display: flex;
+  flex-direction: column;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+@mixin collapse {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin common-text {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+@mixin actions-menu-text {
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+
+@mixin instruments-panel-text {
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+
+@mixin status-bar-text {
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
