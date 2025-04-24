@@ -1,4 +1,4 @@
-type SupportedImageFormat = "jpeg" | "png" | "graybit-7";
+export type SupportedImageFormat = "jpeg" | "png" | "graybit-7";
 
 const SIGNATURES: Record<SupportedImageFormat, number[]> = {
   jpeg: [0xff, 0xd8, 0xff],

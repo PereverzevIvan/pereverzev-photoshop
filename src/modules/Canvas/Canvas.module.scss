@@ -5,12 +5,14 @@
   padding: 10px;
   background-color: lightgray;
   max-height: 100vh;
+  flex-grow: 1;
 }
 
 .canvas {
-  background-color: white;
   display: block;
-  max-width: 100%;
-  height: auto;
+  // height: auto;
+  height: 65vh;
   max-height: 65vh;
+  border: 1px solid darkgray;
+  image-rendering: pixelated;
 }

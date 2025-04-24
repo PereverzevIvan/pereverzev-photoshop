@@ -1,16 +1,16 @@
-import { detectImageFormat } from "./ImageTypeGetter";
+import { detectImageFormat, SupportedImageFormat } from "./ImageTypeGetter";
 
 export async function getColorDepthOfImage(
   file: File,
+  fileType: SupportedImageFormat,
 ): Promise<number | undefined> {
-  const file_type = await detectImageFormat(file);
   const buffer = await file.arrayBuffer();
 
-  if (file_type === "png") {
+  if (fileType === "png") {
     return await getPNGColorDepth(buffer);
-  } else if (file_type === "jpeg") {
+  } else if (fileType === "jpeg") {
     return await getJpegColorDepth(buffer);
-  } else if (file_type === "graybit-7") {
+  } else if (fileType === "graybit-7") {
     return getGB7ColorDepth(buffer);
   }
 }

@@ -1,8 +1,7 @@
 @use "@/scss/globalStyles" as g;
 
 .mainArea {
-  display: grid;
-  grid-template-columns: 30px auto 30px;
   @include g.common-text;
+  display: flex;
   flex-grow: 1;
 }
