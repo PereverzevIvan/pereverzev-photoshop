@@ -12,6 +12,7 @@ export type ImageContextProps = {
   colorDepth: number;
 
   loadImage: (file: File) => void;
+  clearImage: () => void;
 };
 
 const defaultContext: ImageContextProps = {
@@ -23,6 +24,7 @@ const defaultContext: ImageContextProps = {
   colorDepth: 0,
 
   loadImage: () => {},
+  clearImage: () => {},
 };
 
 export const ImageContext = createContext<ImageContextProps>(defaultContext);
@@ -33,6 +35,15 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [colorDepth, setColorDepth] = useState(0);
+
+  // Очистка изображения
+  function clearImage() {
+    const canvas = canvasRef?.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
 
   // Загрузка изображения
   async function loadImage(file: File) {
@@ -115,6 +126,7 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
         height,
         colorDepth,
         loadImage,
+        clearImage,
       }}
     >
       {children}

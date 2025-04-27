@@ -1,12 +1,14 @@
-import { useContext, useRef } from "react";
-import { open_icon } from "../../assets/images/actions";
+import { useContext, useRef, useState } from "react";
 import s from "./ActionsMenu.module.scss";
-import { ActionsGroup } from "./components/ActionList/ActionsGroup";
+import { ActionsGroup } from "./components/ActionGroup/ActionsGroup";
 import { ImageContext } from "../../contexts/ImageContext/ImageContext";
+import { open_icon } from "../../assets/images";
+import { InterpolationModal } from "./components/ImterpolationModal/InterpolationModal";
 
 export function ActionsMenu() {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { loadImage } = useContext(ImageContext);
+  const { loadImage, clearImage } = useContext(ImageContext);
+  const [isOpenInterpolation, setIsOpenInterpolation] = useState(false);
 
   function handleFileOpen() {
     if (inputRef.current) inputRef.current.click();
@@ -35,6 +37,23 @@ export function ActionsMenu() {
         },
       ],
     },
+    {
+      title: "Холст",
+      items: [
+        {
+          text: "Интерполяция",
+          onClick: () => {
+            setIsOpenInterpolation(true);
+          },
+        },
+        {
+          text: "Очистить холст",
+          onClick: () => {
+            clearImage();
+          },
+        },
+      ],
+    },
   ];
 
   return (
@@ -46,9 +65,15 @@ export function ActionsMenu() {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
+      <InterpolationModal
+        isOpen={isOpenInterpolation}
+        onClose={() => setIsOpenInterpolation(false)}
+      />
 
       <div className={s.actionsMenu}>
-        <ActionsGroup title="Файл" items={actionsGroups[0].items} />
+        {actionsGroups.map((group, index) => (
+          <ActionsGroup key={index} {...group} />
+        ))}
       </div>
     </>
   );

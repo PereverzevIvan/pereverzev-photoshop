@@ -2,7 +2,7 @@
 @use "@/scss/variables" as v;
 
 .actionsMenu {
-  @include g.h-flex-container(10px, space-between);
+  @include g.h-flex-container(5px, start, center);
   @include g.actions-menu-text;
   height: v.$action-menu-height;
   width: 100%;
