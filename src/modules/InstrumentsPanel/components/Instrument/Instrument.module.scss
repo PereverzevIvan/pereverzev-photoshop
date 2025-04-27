@@ -1,14 +1,16 @@
 @use "@/scss/globalStyles" as g;
 
+$button-size: 25px;
+
 .instrument {
   @include g.collapse;
   background-color: lightgray;
   color: black;
   border: none;
-  width: 100%;
-  height: 100%;
-  max-width: 25px;
-  max-height: 25px;
+  max-width: $button-size;
+  max-height: $button-size;
+  min-width: $button-size;
+  -height: $button-size;
   cursor: pointer;
 
   .icon {

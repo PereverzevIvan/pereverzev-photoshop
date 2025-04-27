@@ -3,7 +3,7 @@
 .instrumentsPanel {
   @include g.v-flex-container(5px);
   padding: 5px 5px;
-  max-width: 30px;
+  width: fit-content;
   background-color: gray;
   color: white;
 }

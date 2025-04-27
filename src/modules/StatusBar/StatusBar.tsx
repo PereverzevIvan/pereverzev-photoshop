@@ -8,15 +8,13 @@ export function StatusBar() {
   return (
     <>
       <div className={s.statusBar}>
-        <p className={s.property}>
-          <span className={s.propertyName}>Исх. ширина: </span>
-          <span className={s.propertyValue}>{width} px</span>
+        <p className={s.property} title={`Размер: ${width}x${height}`}>
+          <span className={s.propertyName}>Размер: </span>
+          <span className={s.propertyValue}>
+            {width}x{height}
+          </span>
         </p>
-        <p className={s.property}>
-          <span className={s.propertyName}>Исх. высота: </span>
-          <span className={s.propertyValue}>{height} px</span>
-        </p>
-        <p className={s.property}>
+        <p className={s.property} title={`Глубина цвета: ${colorDepth} bit`}>
           <span className={s.propertyName}>Глубина цвета: </span>
           <span className={s.propertyValue}>{colorDepth} bit</span>
         </p>

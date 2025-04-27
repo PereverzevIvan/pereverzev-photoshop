@@ -1,11 +1,12 @@
 @use "@/scss/globalStyles" as g;
+@use "@/scss/variables" as v;
 
 .statusBar {
   @include g.h-flex-container(20px, start, center);
   @include g.status-bar-text;
+  height: v.$statusbar-height;
   width: 100%;
   color: white;
-  height: 30px;
   background-color: gray;
   padding: 10px 10px;
 

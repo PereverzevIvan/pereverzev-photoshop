@@ -1,8 +1,10 @@
 @use "@/scss/globalStyles" as g;
+@use "@/scss/variables" as v;
 
 .actionsMenu {
   @include g.h-flex-container(10px, space-between);
   @include g.actions-menu-text;
+  height: v.$action-menu-height;
   width: 100%;
   background-color: gray;
   padding: 2px 5px;

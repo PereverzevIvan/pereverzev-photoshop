@@ -1,18 +1,22 @@
 @use "@/scss/globalStyles" as g;
+@use "sass:math";
+@use "@/scss/variables" as v;
+
+$padding: 10px;
 
 .canvasContainer {
   @include g.v-flex-container(0px, center, center);
-  padding: 10px;
+  max-height: calc(100vh - v.$statusbar-height - v.$action-menu-height);
+  padding: 5px;
   background-color: lightgray;
-  max-height: 100vh;
   flex-grow: 1;
 }
 
 .canvas {
   display: block;
-  // height: auto;
-  height: 65vh;
-  max-height: 65vh;
   border: 1px solid darkgray;
   image-rendering: pixelated;
+  background-color: white;
+  height: 100%;
+  // object-fit: contain;
 }
