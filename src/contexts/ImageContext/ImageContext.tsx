@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { detectImageFormat } from "./utils/ImageTypeGetter";
 import { getColorDepthOfImage } from "./utils/ColorDepthGetter";
 import { loadGB7Image, loadStandardImage } from "./utils/loadImage";
@@ -20,7 +20,11 @@ export type ImageContextProps = {
 
   loadImage: (file: File) => void;
   clearImage: () => void;
-  resizeImage: (newWidth: number, newHeight: number) => void;
+  resizeImage: (
+    newWidth: number,
+    newHeight: number,
+    method: "nearest" | "bilinear",
+  ) => void;
   drawImageOnCanvas: (data: ImageData) => void;
 };
 
@@ -104,9 +108,36 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
 
     const depth = await getColorDepthOfImage(file, fileType);
     if (depth) setColorDepth(depth);
-
-    drawImageOnCanvas(newImageData);
   }
+
+  // Изменение размера изображения
+  async function resizeImage(
+    newWidth: number,
+    newHeight: number,
+    method: "nearest" | "bilinear",
+  ) {
+    const newImageData = await resizeImageByMethod(
+      imageData,
+      newWidth,
+      newHeight,
+      method,
+    );
+
+    if (!newImageData) {
+      alert("Не удалось изменить размер изображения");
+      return;
+    }
+
+    setImageData(newImageData);
+    setWidth(newImageData.width);
+    setHeight(newImageData.height);
+  }
+
+  useEffect(() => {
+    if (imageData) {
+      drawImageOnCanvas(imageData);
+    }
+  }, [imageData, scaleValue]);
 
   function drawImageOnCanvas(data: ImageData) {
     const canvas = canvasRef?.current;
@@ -131,36 +162,6 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
     } else {
       alert("Canvas не найден");
     }
-  }
-
-  // Изменение размера изображения
-  function resizeImage(newWidth: number, newHeight: number) {
-    const newImageData = resizeImageByMethod(
-      imageData,
-      newWidth,
-      newHeight,
-      "nearest-neighbor",
-    );
-
-    if (!newImageData) {
-      alert("Не удалось изменить размер изображения");
-      return;
-    }
-
-    const canvas = canvasRef?.current;
-    if (canvas) {
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-    } else {
-      alert("Canvas не найден");
-    }
-
-    const ctx = canvas?.getContext("2d");
-    if (ctx && imageData) ctx.putImageData(newImageData, 0, 0);
-
-    setImageData(newImageData);
-    setWidth(newWidth);
-    setHeight(newHeight);
   }
 
   return (

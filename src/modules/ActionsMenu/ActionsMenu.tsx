@@ -43,8 +43,8 @@ export function ActionsMenu() {
         {
           text: "Интерполяция",
           onClick: () => {
-            resizeImage(1230, 1560);
-            // setIsOpenInterpolation(true);
+            // resizeImage(1230, 1560, "bilinear");
+            setIsOpenInterpolation(true);
           },
         },
         {

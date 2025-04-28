@@ -1,9 +1,9 @@
-export function resizeImageByMethod(
+export async function resizeImageByMethod(
   src: ImageData | null,
   newWidth: number,
   newHeight: number,
-  method: "nearest-neighbor" | "bilinear",
-): ImageData | null {
+  method: "nearest" | "bilinear",
+): Promise<ImageData | null> {
   if (!src) {
     alert("Изображение не загружено");
     return src;
@@ -20,18 +20,18 @@ export function resizeImageByMethod(
   }
 
   switch (method) {
-    case "nearest-neighbor":
-      return resizeNearestNeighbor(src, newWidth, newHeight);
+    case "nearest":
+      return await resizeNearestNeighbor(src, newWidth, newHeight);
     case "bilinear":
-      return resizeBilinear(src, newWidth, newHeight);
+      return await resizeBilinear(src, newWidth, newHeight);
   }
 }
 
-export function resizeNearestNeighbor(
+export async function resizeNearestNeighbor(
   src: ImageData,
   newWidth: number,
   newHeight: number,
-): ImageData {
+): Promise<ImageData> {
   const srcWidth = src.width;
   const srcHeight = src.height;
   const srcData = src.data;
@@ -60,11 +60,11 @@ export function resizeNearestNeighbor(
   return dest;
 }
 
-export function resizeBilinear(
+export async function resizeBilinear(
   src: ImageData,
   newWidth: number,
   newHeight: number,
-): ImageData {
+): Promise<ImageData> {
   const srcWidth = src.width;
   const srcHeight = src.height;
   const srcData = src.data;

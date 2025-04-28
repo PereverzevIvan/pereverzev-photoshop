@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 import s from "./StatusBar.module.scss";
 import { ImageContext } from "../../contexts/ImageContext/ImageContext";
-import { scaleImage } from "../../contexts/ImageContext/utils/scaleImage";
 
 export function StatusBar() {
   const {
@@ -9,9 +8,6 @@ export function StatusBar() {
     height,
     colorDepth,
     setScaleValue,
-    drawImageOnCanvas,
-    imageData,
-    scaleValue,
     renderMethod,
     setRenderMethod,
   } = useContext(ImageContext);
@@ -26,12 +22,6 @@ export function StatusBar() {
     const value = event.target.value as "normal" | "pixelated";
     setRenderMethod(value);
   }
-
-  useEffect(() => {
-    if (imageData) {
-      drawImageOnCanvas(imageData);
-    }
-  }, [scaleValue]);
 
   return (
     <>
