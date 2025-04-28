@@ -76,3 +76,33 @@ export function parseGB7Pixels(buffer: ArrayBuffer): GB7Pixel[][] | null {
 
   return pixels;
 }
+
+export async function getGB7ImageData(
+  gb7Image: GB7Pixel[][] | null,
+): Promise<ImageData | null> {
+  if (!gb7Image) {
+    alert("Не удалось загрузить изображение. Ошибка формата.");
+    return null;
+  }
+
+  const imgWidth = gb7Image[0].length;
+  const imgHeight = gb7Image.length;
+
+  const imageData = new ImageData(imgWidth, imgHeight);
+  const data = imageData.data;
+
+  let i = 0;
+  for (let y = 0; y < imgHeight; y++) {
+    for (let x = 0; x < imgWidth; x++) {
+      const { gray, masked } = gb7Image[y][x];
+      const color = gray * 2; // 7-битный -> 8-битный (примерно)
+
+      data[i++] = color; // R
+      data[i++] = color; // G
+      data[i++] = color; // B
+      data[i++] = masked ? 0 : 255; // A: 0 если замаскирован, 255 иначе
+    }
+  }
+
+  return imageData;
+}

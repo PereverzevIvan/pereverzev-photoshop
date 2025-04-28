@@ -1,14 +1,17 @@
 @use "@/scss/globalStyles" as g;
 @use "@/scss/variables" as v;
 
+$padding-h: 20px;
+$padding-v: 10px;
+
 .statusBar {
-  @include g.h-flex-container(20px, start, center);
+  @include g.h-flex-container(20px, space-between, center);
   @include g.status-bar-text;
   height: v.$statusbar-height;
   width: 100%;
   color: white;
   background-color: gray;
-  padding: 10px 10px;
+  padding: $padding-v $padding-h;
 
   .property {
     @include g.collapse();

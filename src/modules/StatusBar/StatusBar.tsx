@@ -1,9 +1,37 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import s from "./StatusBar.module.scss";
 import { ImageContext } from "../../contexts/ImageContext/ImageContext";
+import { scaleImage } from "../../contexts/ImageContext/utils/scaleImage";
 
 export function StatusBar() {
-  const { width, height, colorDepth } = useContext(ImageContext);
+  const {
+    width,
+    height,
+    colorDepth,
+    setScaleValue,
+    drawImageOnCanvas,
+    imageData,
+    scaleValue,
+    renderMethod,
+    setRenderMethod,
+  } = useContext(ImageContext);
+
+  function handleChangeScale(event: React.ChangeEvent<HTMLSelectElement>) {
+    const value = parseFloat(event.target.value);
+    setScaleValue(value);
+  }
+  function handleChangeRenderMethod(
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) {
+    const value = event.target.value as "normal" | "pixelated";
+    setRenderMethod(value);
+  }
+
+  useEffect(() => {
+    if (imageData) {
+      drawImageOnCanvas(imageData);
+    }
+  }, [scaleValue]);
 
   return (
     <>
@@ -18,6 +46,31 @@ export function StatusBar() {
           <span className={s.propertyName}>Глубина цвета: </span>
           <span className={s.propertyValue}>{colorDepth} bit</span>
         </p>
+
+        <select
+          name="renderMethod"
+          id="renderMethod"
+          defaultValue={renderMethod}
+          onChange={handleChangeRenderMethod}
+        >
+          <option value="normal">Нормальный</option>
+          <option value="pixelated">Пиксели</option>
+        </select>
+
+        <select
+          name="scale"
+          id="scale"
+          defaultValue={1}
+          onChange={handleChangeScale}
+        >
+          <option value="0.12">12%</option>
+          <option value="0.5">50%</option>
+          <option value="1">100%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="2.5">250%</option>
+          <option value="3">300%</option>
+        </select>
       </div>
     </>
   );

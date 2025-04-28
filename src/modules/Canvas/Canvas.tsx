@@ -4,7 +4,8 @@ import { ImageContext } from "../../contexts/ImageContext/ImageContext";
 
 export function CanvasModule() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { setCanvasRef, width, height } = useContext(ImageContext);
+  const { setCanvasRef, width, height, renderMethod } =
+    useContext(ImageContext);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -12,11 +13,17 @@ export function CanvasModule() {
     }
   }, [canvasRef, setCanvasRef]);
 
-  const aspectRatio = width && height ? width / height : 1;
-
   return (
     <div className={s.canvasContainer}>
-      <canvas className={s.canvas} ref={canvasRef} />
+      <canvas
+        className={s.canvas}
+        ref={canvasRef}
+        style={
+          renderMethod == "pixelated" ? { imageRendering: "pixelated" } : {}
+        }
+        width={width}
+        height={height}
+      />
     </div>
   );
 }

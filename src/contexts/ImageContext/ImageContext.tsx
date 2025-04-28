@@ -1,30 +1,46 @@
 import React, { createContext, useState } from "react";
-import { detectImageFormat } from "./ImageTypeGetter";
-import { parseGB7Pixels } from "./ParseGB7";
-import { getColorDepthOfImage } from "./ColorDepthGetter";
+import { detectImageFormat } from "./utils/ImageTypeGetter";
+import { getColorDepthOfImage } from "./utils/ColorDepthGetter";
+import { loadGB7Image, loadStandardImage } from "./utils/loadImage";
+import { resizeImageByMethod } from "./utils/resize";
+import { scaleImage } from "./utils/scaleImage";
 
 export type ImageContextProps = {
   canvasRef: React.RefObject<HTMLCanvasElement> | null;
   setCanvasRef: (ref: React.RefObject<HTMLCanvasElement> | null) => void;
 
+  imageData: ImageData | null;
   width: number;
   height: number;
   colorDepth: number;
+  scaleValue: number;
+  setScaleValue: (value: number) => void;
+  renderMethod: "normal" | "pixelated";
+  setRenderMethod: (method: "normal" | "pixelated") => void;
 
   loadImage: (file: File) => void;
   clearImage: () => void;
+  resizeImage: (newWidth: number, newHeight: number) => void;
+  drawImageOnCanvas: (data: ImageData) => void;
 };
 
 const defaultContext: ImageContextProps = {
   canvasRef: null,
   setCanvasRef: () => {},
 
+  imageData: null,
   width: 0,
   height: 0,
   colorDepth: 0,
+  scaleValue: 1,
+  setScaleValue: () => {},
+  renderMethod: "normal",
+  setRenderMethod: () => {},
 
   loadImage: () => {},
   clearImage: () => {},
+  resizeImage: () => {},
+  drawImageOnCanvas: () => {},
 };
 
 export const ImageContext = createContext<ImageContextProps>(defaultContext);
@@ -32,9 +48,14 @@ export const ImageContext = createContext<ImageContextProps>(defaultContext);
 export function ImageProvider({ children }: { children: React.ReactNode }) {
   const [canvasRef, setCanvasRef] =
     useState<React.RefObject<HTMLCanvasElement> | null>(null);
+  const [imageData, setImageData] = useState<ImageData | null>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [colorDepth, setColorDepth] = useState(0);
+  const [scaleValue, setScaleValue] = useState(1);
+  const [renderMethod, setRenderMethod] = useState<"normal" | "pixelated">(
+    "normal",
+  );
 
   // Очистка изображения
   function clearImage() {
@@ -42,79 +63,104 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
     if (canvas) {
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      setImageData(null);
+      setWidth(0);
+      setHeight(0);
+      setColorDepth(0);
+    } else {
+      alert("Canvas не найден");
     }
   }
 
   // Загрузка изображения
   async function loadImage(file: File) {
-    const fileType = await detectImageFormat(file);
+    let fileType = "";
 
-    if (fileType === "png" || fileType === "jpeg") loadStandardImage(file);
-    else if (fileType === "graybit-7") loadGB7Image(file);
+    try {
+      fileType = await detectImageFormat(file);
+    } catch (error) {
+      alert("Произошла ошибка при загрузке изображения: " + error);
+      return;
+    }
+    let newImageData: ImageData | null = null;
 
-    const depth = await getColorDepthOfImage(file, fileType);
-    if (depth) setColorDepth(depth);
-  }
-
-  function loadStandardImage(file: File) {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = canvasRef?.current;
-      if (!canvas) return;
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      const ctx = canvas.getContext("2d");
-      if (ctx) ctx.drawImage(img, 0, 0);
-
-      setWidth(img.width);
-      setHeight(img.height);
-    };
-    img.src = URL.createObjectURL(file);
-  }
-
-  // Загрузка GB7-изображения
-  async function loadGB7Image(file: File) {
-    const canvas = canvasRef?.current;
-    if (!canvas) return;
-
-    const buffer = await file.arrayBuffer();
-    const gb7Image = parseGB7Pixels(buffer);
-    if (!gb7Image) {
-      alert("Не удалось загрузить изображение. Ошибка формата.");
+    if (fileType === "png" || fileType === "jpeg")
+      newImageData = await loadStandardImage(file);
+    else if (fileType === "graybit-7") newImageData = await loadGB7Image(file);
+    else {
+      alert("Неподдерживаемый формат изображения");
       return;
     }
 
-    const imgWidth = gb7Image[0].length;
-    const imgHeight = gb7Image.length;
-
-    canvas.width = imgWidth;
-    canvas.height = imgHeight;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const imageData = new ImageData(imgWidth, imgHeight);
-    const data = imageData.data;
-
-    let i = 0;
-    for (let y = 0; y < imgHeight; y++) {
-      for (let x = 0; x < imgWidth; x++) {
-        const { gray, masked } = gb7Image[y][x];
-        const color = gray * 2; // 7-битный -> 8-битный (примерно)
-
-        data[i++] = color; // R
-        data[i++] = color; // G
-        data[i++] = color; // B
-        data[i++] = masked ? 0 : 255; // A: 0 если замаскирован, 255 иначе
-      }
+    if (!newImageData) {
+      alert("Не удалось загрузить изображение");
+      return;
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    setImageData(newImageData);
+    setWidth(newImageData.width);
+    setHeight(newImageData.height);
 
-    setWidth(imgWidth);
-    setHeight(imgHeight);
+    const depth = await getColorDepthOfImage(file, fileType);
+    if (depth) setColorDepth(depth);
+
+    drawImageOnCanvas(newImageData);
+  }
+
+  function drawImageOnCanvas(data: ImageData) {
+    const canvas = canvasRef?.current;
+
+    if (canvas) {
+      const scale = scaleImage({
+        imageWidth: data.width,
+        imageHeight: data.height,
+        scale: scaleValue,
+      });
+
+      if (!scale) {
+        alert("Не удалось изменить размер изображения");
+        return;
+      }
+
+      canvas.width = scale.newCanvasWidth;
+      canvas.height = scale.newCanvasHeight;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.putImageData(data, scale.imageOffsetX, scale.imageOffsetY);
+    } else {
+      alert("Canvas не найден");
+    }
+  }
+
+  // Изменение размера изображения
+  function resizeImage(newWidth: number, newHeight: number) {
+    const newImageData = resizeImageByMethod(
+      imageData,
+      newWidth,
+      newHeight,
+      "nearest-neighbor",
+    );
+
+    if (!newImageData) {
+      alert("Не удалось изменить размер изображения");
+      return;
+    }
+
+    const canvas = canvasRef?.current;
+    if (canvas) {
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+    } else {
+      alert("Canvas не найден");
+    }
+
+    const ctx = canvas?.getContext("2d");
+    if (ctx && imageData) ctx.putImageData(newImageData, 0, 0);
+
+    setImageData(newImageData);
+    setWidth(newWidth);
+    setHeight(newHeight);
   }
 
   return (
@@ -122,11 +168,18 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
       value={{
         canvasRef,
         setCanvasRef,
+        imageData,
         width,
         height,
+        scaleValue,
+        setScaleValue,
         colorDepth,
         loadImage,
+        renderMethod,
+        setRenderMethod,
         clearImage,
+        resizeImage,
+        drawImageOnCanvas,
       }}
     >
       {children}
