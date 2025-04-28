@@ -1,0 +1,21 @@
+.form {
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+
+  .inputContainer {
+    display: flex;
+    gap: 0.2rem;
+    flex-direction: column;
+  }
+
+  .error {
+    font-size: 0.8rem;
+    border: 1px solid crimson;
+    padding: 5px;
+    color: crimson;
+    background-color: pink;
+  }
+}
