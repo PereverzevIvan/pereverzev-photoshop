@@ -1,9 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
-import { detectImageFormat } from "./utils/ImageTypeGetter";
-import { getColorDepthOfImage } from "./utils/ColorDepthGetter";
-import { loadGB7Image, loadStandardImage } from "./utils/loadImage";
-import { resizeImageByMethod } from "./utils/resize";
-import { scaleImage } from "./utils/scaleImage";
+import { detectImageFormat } from "../../utils/ImageTypeGetter";
+import { loadGB7Image, loadStandardImage } from "../../utils/loadImage";
+import { getColorDepthOfImage } from "../../utils/ColorDepthGetter";
+import { resizeImageByMethod } from "../../utils/resize";
+import { findClosestScaleBelow, scaleImage } from "../../utils/scaleImage";
 
 export type ImageContextProps = {
   canvasRef: React.RefObject<HTMLCanvasElement> | null;
@@ -87,6 +87,7 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
       alert("Произошла ошибка при загрузке изображения: " + error);
       return;
     }
+
     let newImageData: ImageData | null = null;
 
     if (fileType === "png" || fileType === "jpeg")
@@ -102,6 +103,20 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    const canvas = canvasRef?.current;
+    if (!canvas) {
+      alert("Canvas не найден");
+      return;
+    }
+
+    const closestScale = findClosestScaleBelow(
+      canvas.width,
+      canvas.height,
+      newImageData.width,
+      newImageData.height,
+    );
+
+    setScaleValue(closestScale);
     setImageData(newImageData);
     setWidth(newImageData.width);
     setHeight(newImageData.height);
@@ -133,36 +148,44 @@ export function ImageProvider({ children }: { children: React.ReactNode }) {
     setHeight(newImageData.height);
   }
 
-  useEffect(() => {
-    if (imageData) {
-      drawImageOnCanvas(imageData);
-    }
-  }, [imageData, scaleValue]);
-
-  function drawImageOnCanvas(data: ImageData) {
+  async function drawImageOnCanvas(data: ImageData) {
     const canvas = canvasRef?.current;
 
     if (canvas) {
-      const scale = scaleImage({
-        imageWidth: data.width,
-        imageHeight: data.height,
+      const scale = await scaleImage({
+        canvas,
+        imageData: data,
         scale: scaleValue,
       });
+      console.log(scale);
 
       if (!scale) {
         alert("Не удалось изменить размер изображения");
         return;
       }
 
-      canvas.width = scale.newCanvasWidth;
-      canvas.height = scale.newCanvasHeight;
+      // canvas.width = scale.newCanvasWidth;
+      // canvas.height = scale.newCanvasHeight;
 
       const ctx = canvas.getContext("2d");
-      if (ctx) ctx.putImageData(data, scale.imageOffsetX, scale.imageOffsetY);
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.putImageData(
+          scale.scaledImageData,
+          scale.imageOffsetX,
+          scale.imageOffsetY,
+        );
+      }
     } else {
       alert("Canvas не найден");
     }
   }
+
+  useEffect(() => {
+    if (imageData) {
+      drawImageOnCanvas(imageData);
+    }
+  }, [imageData, scaleValue]);
 
   return (
     <ImageContext.Provider

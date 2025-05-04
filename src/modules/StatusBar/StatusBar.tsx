@@ -1,6 +1,7 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import s from "./StatusBar.module.scss";
 import { ImageContext } from "../../contexts/ImageContext/ImageContext";
+import { CScales } from "../../utils/scaleImage";
 
 export function StatusBar() {
   const {
@@ -8,6 +9,7 @@ export function StatusBar() {
     height,
     colorDepth,
     setScaleValue,
+    scaleValue,
     renderMethod,
     setRenderMethod,
   } = useContext(ImageContext);
@@ -50,16 +52,14 @@ export function StatusBar() {
         <select
           name="scale"
           id="scale"
-          defaultValue={1}
+          value={scaleValue}
           onChange={handleChangeScale}
         >
-          <option value="0.12">12%</option>
-          <option value="0.5">50%</option>
-          <option value="1">100%</option>
-          <option value="1.5">150%</option>
-          <option value="2">200%</option>
-          <option value="2.5">250%</option>
-          <option value="3">300%</option>
+          {Object.values(CScales).map((scale) => (
+            <option key={scale} value={scale}>
+              {Math.round(scale * 100)}%
+            </option>
+          ))}
         </select>
       </div>
     </>

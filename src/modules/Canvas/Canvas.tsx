@@ -4,13 +4,32 @@ import { ImageContext } from "../../contexts/ImageContext/ImageContext";
 
 export function CanvasModule() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { setCanvasRef, width, height, renderMethod } =
-    useContext(ImageContext);
+  const { setCanvasRef, renderMethod } = useContext(ImageContext);
 
   useEffect(() => {
-    if (canvasRef.current) {
-      setCanvasRef(canvasRef);
-    }
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+
+    // Функция обновления размеров канваса
+    const updateCanvasSize = () => {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    };
+
+    // Сразу выставляем начальные размеры
+    updateCanvasSize();
+    setCanvasRef(canvasRef);
+
+    // Наблюдаем за изменениями размеров канваса
+    const resizeObserver = new ResizeObserver(() => {
+      updateCanvasSize();
+    });
+    resizeObserver.observe(canvas);
+
+    // Отписка при размонтировании
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, [canvasRef, setCanvasRef]);
 
   return (
@@ -19,10 +38,8 @@ export function CanvasModule() {
         className={s.canvas}
         ref={canvasRef}
         style={
-          renderMethod == "pixelated" ? { imageRendering: "pixelated" } : {}
+          renderMethod === "pixelated" ? { imageRendering: "pixelated" } : {}
         }
-        width={width}
-        height={height}
       />
     </div>
   );

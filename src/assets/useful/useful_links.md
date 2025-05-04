@@ -1,6 +1,6 @@
 # Полезные материалы
 
-## Полезные ссылки
+## Лаба 1
 
 1. [Сайт с иконками](https://scripting.krita.org/icon-library)
 2. [Статья про png - 1](https://habr.com/ru/companies/selectel/articles/856084/)
@@ -9,10 +9,9 @@
 5. [Статья про jpg - 1](https://habr.com/ru/companies/vk/articles/512004/)
 6. [Статья про jpg - 2](https://habr.com/ru/articles/102521/)
 
-## Строение jpg
+![jpeg_structure](./task1/jpeg_structure.webp)
+![png_structure](./task1/png_structure.png)
 
-[jpeg_structure](./images/useful/jpeg_structure.webp)
+## Лаба 2
 
-## Строение png
-
-[png_structure](./images/useful/png_structure.png)
+1.
