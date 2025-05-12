@@ -79,7 +79,7 @@ export function InterpolationForm(props: InterpolationFormProps) {
       setValue("newWidth", width);
       setValue("newHeight", height);
     }
-  }, [unit]);
+  }, [unit, width, height]);
 
   const onSubmit = (data: InterpolationForm) => {
     if (data.unit === "percent") {
@@ -116,9 +116,11 @@ export function InterpolationForm(props: InterpolationFormProps) {
             required: "Введите ширину",
             min: { value: 1, message: "Ширина должна быть больше 0" },
             max: {
-              value: unit === "pixel" ? width * 3 : 300,
+              value: unit === "pixel" ? width * 4 : 300,
               message:
-                unit === "pixel" ? "Слишком большая ширина" : "Максимум 100%",
+                unit === "pixel"
+                  ? `Слишком большая ширина. Максимум: ${width * 4}`
+                  : "Максимум 300%",
             },
           })}
         />
@@ -138,7 +140,9 @@ export function InterpolationForm(props: InterpolationFormProps) {
             max: {
               value: unit === "pixel" ? height * 3 : 300,
               message:
-                unit === "pixel" ? "Слишком большая высота" : "Максимум 100%",
+                unit === "pixel"
+                  ? `Слишком большая высота. Максимум: ${height * 3}`
+                  : "Максимум 300%",
             },
           })}
           disabled={aspectRatio}

@@ -19,17 +19,6 @@ export function CanvasModule() {
     // Сразу выставляем начальные размеры
     updateCanvasSize();
     setCanvasRef(canvasRef);
-
-    // Наблюдаем за изменениями размеров канваса
-    const resizeObserver = new ResizeObserver(() => {
-      updateCanvasSize();
-    });
-    resizeObserver.observe(canvas);
-
-    // Отписка при размонтировании
-    return () => {
-      resizeObserver.disconnect();
-    };
   }, [canvasRef, setCanvasRef]);
 
   return (

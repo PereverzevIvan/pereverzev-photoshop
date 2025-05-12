@@ -6,8 +6,8 @@ import { resizeImageByMethod } from "../../utils/resize";
 import { findClosestScaleBelow, scaleImage } from "../../utils/scaleImage";
 
 export type ImageContextProps = {
-  canvasRef: React.RefObject<HTMLCanvasElement> | null;
-  setCanvasRef: (ref: React.RefObject<HTMLCanvasElement> | null) => void;
+  canvasRef: React.RefObject<HTMLCanvasElement | null> | null;
+  setCanvasRef: (ref: React.RefObject<HTMLCanvasElement | null> | null) => void;
 
   imageData: ImageData | null;
   width: number;
@@ -51,7 +51,7 @@ export const ImageContext = createContext<ImageContextProps>(defaultContext);
 
 export function ImageProvider({ children }: { children: React.ReactNode }) {
   const [canvasRef, setCanvasRef] =
-    useState<React.RefObject<HTMLCanvasElement> | null>(null);
+    useState<React.RefObject<HTMLCanvasElement | null> | null>(null);
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
