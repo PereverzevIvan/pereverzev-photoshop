@@ -37,14 +37,6 @@ export function findClosestScaleBelow(
     return Math.min(...CScales);
   }
 
-  console.log(validScales);
-  console.log(fitScale);
-  console.log(
-    validScales.reduce((prev, curr) =>
-      Math.abs(curr - fitScale) < Math.abs(prev - fitScale) ? curr : prev,
-    ),
-  );
-
   // Возьмем ближайший к fitScale из validScales
   return validScales.reduce((prev, curr) =>
     Math.abs(curr - fitScale) < Math.abs(prev - fitScale) ? curr : prev,

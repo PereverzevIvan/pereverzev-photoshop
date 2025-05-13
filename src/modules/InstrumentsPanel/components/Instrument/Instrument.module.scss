@@ -17,4 +17,9 @@ $button-size: 25px;
     width: 100%;
     height: 100%;
   }
+
+  &_active {
+    background-color: white;
+    outline: lightgrey;
+  }
 }
