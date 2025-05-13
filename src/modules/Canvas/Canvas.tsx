@@ -8,7 +8,6 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 export function CanvasModule() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
     setCanvasRef,
     renderMethod,
@@ -18,42 +17,64 @@ export function CanvasModule() {
   } = useImageContext();
   const { activeToolID } = useTool();
 
-  const [isDragging, setIsDragging] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (activeToolID !== 1) return;
-    setIsDragging(true);
-    lastPos.current = { x: e.clientX, y: e.clientY };
+    if (activeToolID === 1) {
+      setIsDragging(true);
+      lastPos.current = { x: e.clientX, y: e.clientY };
+    }
+
+    if (activeToolID === 2) {
+      const canvas = canvasRef.current;
+      if (!canvas || !scalledImageData) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const [r, g, b, a] = pixel;
+
+      const rgba = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+      console.log("Picked color:", rgba);
+      console.log(x, y);
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || activeToolID !== 1) return;
-    if (!lastPos.current || !canvasRef.current || !scalledImageData) return;
+    if (activeToolID === 1) {
+      if (!isDragging) return;
+      if (!lastPos.current || !canvasRef.current || !scalledImageData) return;
 
-    const dx = e.clientX - lastPos.current.x;
-    const dy = e.clientY - lastPos.current.y;
+      const dx = e.clientX - lastPos.current.x;
+      const dy = e.clientY - lastPos.current.y;
 
-    const imageWidth = scalledImageData.width;
-    const imageHeight = scalledImageData.height;
-    const canvasWidth = canvasRef.current.clientWidth;
-    const canvasHeight = canvasRef.current.clientHeight;
+      const imageWidth = scalledImageData.width;
+      const imageHeight = scalledImageData.height;
+      const canvasWidth = canvasRef.current.clientWidth;
+      const canvasHeight = canvasRef.current.clientHeight;
 
-    setOffsetX((prevX) => {
-      const newX = prevX + dx;
-      const minX = -imageWidth + 100;
-      const maxX = canvasWidth - 100;
-      return clamp(newX, minX, maxX);
-    });
+      setOffsetX((prevX) => {
+        const newX = prevX + dx;
+        const minX = -imageWidth + 100;
+        const maxX = canvasWidth - 100;
+        return clamp(newX, minX, maxX);
+      });
 
-    setOffsetY((prevY) => {
-      const newY = prevY + dy;
-      const minY = -imageHeight + 100;
-      const maxY = canvasHeight - 100;
-      return clamp(newY, minY, maxY);
-    });
+      setOffsetY((prevY) => {
+        const newY = prevY + dy;
+        const minY = -imageHeight + 100;
+        const maxY = canvasHeight - 100;
+        return clamp(newY, minY, maxY);
+      });
 
-    lastPos.current = { x: e.clientX, y: e.clientY };
+      lastPos.current = { x: e.clientX, y: e.clientY };
+    }
   };
 
   const handleMouseUp = () => {
@@ -89,6 +110,7 @@ export function CanvasModule() {
           cursor: activeToolID === 1 ? (isDragging ? "move" : "grab") : "auto",
         }}
       />
+      {/*TODO: Спросить у Владислава Юрьевича, как можно сделать скролы */}
     </div>
   );
 }

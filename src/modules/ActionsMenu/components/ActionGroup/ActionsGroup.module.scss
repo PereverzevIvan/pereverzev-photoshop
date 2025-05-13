@@ -5,6 +5,7 @@
   width: fit-content;
   background-color: gray;
   position: relative;
+  z-index: 10;
 
   .title {
     @include g.collapse;
