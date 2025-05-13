@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext } from "react";
 
 interface ToolContextProps {
   activeToolID: number;
-  setActiveToolID: (id: number) => void;
+  setActiveToolID: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ToolContext = createContext<ToolContextProps>({

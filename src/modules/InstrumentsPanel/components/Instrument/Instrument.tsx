@@ -14,7 +14,7 @@ export function Instrument(props: InstrumentProps) {
   const { setActiveToolID } = useTool();
 
   function handleClick(id: number) {
-    setActiveToolID(id);
+    setActiveToolID((prev) => (prev == id ? 0 : id));
     props.onClick();
   }
 

@@ -18,8 +18,8 @@ export type ImageContextProps = {
   renderMethod: "normal" | "pixelated";
   offsetX: number;
   offsetY: number;
-  setOffsetX: (x: number) => void;
-  setOffsetY: (y: number) => void;
+  setOffsetX: (value: React.SetStateAction<number>) => void;
+  setOffsetY: (value: React.SetStateAction<number>) => void;
   setRenderMethod: (method: "normal" | "pixelated") => void;
   setScaleValue: (value: number) => void;
 
