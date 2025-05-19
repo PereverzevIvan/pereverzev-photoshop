@@ -26,16 +26,16 @@ export function CanvasModule() {
   function getCursor(activeToolID: number) {
     if (activeToolID == 1) {
       if (isDragging) {
-        return "grabbing";
+        return "move";
       }
-      return "move";
+      return "grab";
     }
 
     if (activeToolID == 2) {
       return "crosshair";
     }
 
-    return "auto";
+    return "default";
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
