@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import s from "./Canvas.module.scss";
 import { useImageContext } from "../../contexts/ImageContext/ImageContext";
 import { useTool } from "../../contexts/ToolContext/ToolContext";
+import { useColorPickerContext } from "../../contexts/ColorPickerContext/ColorPickerContext";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -16,10 +17,26 @@ export function CanvasModule() {
     scalledImageData,
   } = useImageContext();
   const { activeToolID } = useTool();
+  const { setFirstPickedColor, setSecondPickedColor } = useColorPickerContext();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  function getCursor(activeToolID: number) {
+    if (activeToolID == 1) {
+      if (isDragging) {
+        return "grabbing";
+      }
+      return "move";
+    }
+
+    if (activeToolID == 2) {
+      return "crosshair";
+    }
+
+    return "auto";
+  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (activeToolID === 1) {
@@ -40,9 +57,13 @@ export function CanvasModule() {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
       const [r, g, b, a] = pixel;
 
-      const rgba = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-      console.log("Picked color:", rgba);
-      console.log(x, y);
+      if (e.button == 0) {
+        if (e.ctrlKey) {
+          setSecondPickedColor([r, g, b, a]);
+        } else {
+          setFirstPickedColor([r, g, b, a]);
+        }
+      }
     }
   };
 
@@ -107,7 +128,7 @@ export function CanvasModule() {
         onMouseUp={handleMouseUp}
         style={{
           imageRendering: renderMethod === "pixelated" ? "pixelated" : "auto",
-          cursor: activeToolID === 1 ? (isDragging ? "move" : "grab") : "auto",
+          cursor: getCursor(activeToolID),
         }}
       />
       {/*TODO: Спросить у Владислава Юрьевича, как можно сделать скролы */}

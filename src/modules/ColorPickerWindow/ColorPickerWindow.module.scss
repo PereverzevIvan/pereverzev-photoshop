@@ -1,0 +1,29 @@
+.colorPickerInfo {
+  // width: 300px;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  gap: 10px;
+  background-color: white;
+  flex-direction: column;
+}
+
+.colorInfoContainer {
+  display: flex;
+  gap: 10px;
+}
+
+.colorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.colorPreview {
+  width: 100%;
+  height: 50px;
+  border: 1px solid black;
+}
