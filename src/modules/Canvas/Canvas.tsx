@@ -8,12 +8,16 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+const thubnailSize = 40;
+
 export function CanvasModule() {
   const {
     setCanvasRef,
     renderMethod,
     setOffsetX,
     setOffsetY,
+    offsetX,
+    offsetY,
     scalledImageData,
   } = useImageContext();
   const { activeToolID } = useTool();
@@ -22,6 +26,14 @@ export function CanvasModule() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const [scrollX, setScrollX] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const draggingRef = useRef<null | {
+    axis: "x" | "y";
+    start: number;
+    startScroll: number;
+  }>(null);
 
   function getCursor(activeToolID: number) {
     if (activeToolID == 1) {
@@ -37,6 +49,65 @@ export function CanvasModule() {
 
     return "default";
   }
+
+  const startDragging = (e: React.MouseEvent, axis: "x" | "y") => {
+    e.preventDefault();
+    const start = axis === "x" ? e.clientX : e.clientY;
+    const currentScroll = axis === "x" ? scrollX : scrollY;
+    draggingRef.current = { axis, start, startScroll: currentScroll };
+    window.addEventListener("mousemove", handleDrag);
+    window.addEventListener("mouseup", stopDragging);
+  };
+
+  const handleDrag = (e: MouseEvent) => {
+    if (!draggingRef.current) return;
+
+    const { axis, start, startScroll } = draggingRef.current;
+    const delta = (axis === "x" ? e.clientX : e.clientY) - start + startScroll;
+    const trackSize =
+      axis === "x"
+        ? (canvasRef.current?.clientWidth ?? 1)
+        : (canvasRef.current?.clientHeight ?? 1);
+
+    const newScroll = clamp(
+      startScroll + delta / (trackSize - thubnailSize),
+      0,
+      1,
+    );
+    if (axis === "x") {
+      setScrollX(newScroll);
+      updateOffsetX(newScroll);
+    } else {
+      setScrollY(newScroll);
+      updateOffsetY(newScroll);
+    }
+  };
+
+  const stopDragging = () => {
+    draggingRef.current = null;
+    window.removeEventListener("mousemove", handleDrag);
+    window.removeEventListener("mouseup", stopDragging);
+  };
+
+  const updateOffsetX = (value: number) => {
+    if (!scalledImageData || !canvasRef.current) return;
+    const imageWidth = scalledImageData.width;
+    const canvasWidth = canvasRef.current.clientWidth;
+    const min = -imageWidth + 100;
+    const max = canvasWidth - 100;
+    const offset = min + (max - min) * value;
+    setOffsetX(clamp(offset, min, max));
+  };
+
+  const updateOffsetY = (value: number) => {
+    if (!scalledImageData || !canvasRef.current) return;
+    const imageHeight = scalledImageData.height;
+    const canvasHeight = canvasRef.current.clientHeight;
+    const min = -imageHeight + 100;
+    const max = canvasHeight - 100;
+    const offset = min + (max - min) * value;
+    setOffsetY(clamp(offset, min, max));
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (activeToolID === 1) {
@@ -104,6 +175,27 @@ export function CanvasModule() {
   };
 
   useEffect(() => {
+    if (!scalledImageData || !canvasRef.current) return;
+
+    const imageWidth = scalledImageData.width;
+    const canvasWidth = canvasRef.current.clientWidth;
+    const min = -imageWidth + 100;
+    const max = canvasWidth - 100;
+    setScrollX((offsetX - min) / (max - min));
+    console.log((offsetX - min) / (max - min));
+  }, [offsetX]);
+
+  useEffect(() => {
+    if (!scalledImageData || !canvasRef.current) return;
+
+    const imageHeight = scalledImageData.height;
+    const canvasHeight = canvasRef.current.clientHeight;
+    const min = -imageHeight + 100;
+    const max = canvasHeight - 100;
+    setScrollY((offsetY - min) / (max - min));
+  }, [offsetY]);
+
+  useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
@@ -116,7 +208,7 @@ export function CanvasModule() {
     // Сразу выставляем начальные размеры
     updateCanvasSize();
     setCanvasRef(canvasRef);
-  }, [canvasRef, setCanvasRef]);
+  }, [canvasRef, setCanvasRef, canvasRef.current?.clientWidth]);
 
   return (
     <div className={s.canvasContainer}>
@@ -131,7 +223,28 @@ export function CanvasModule() {
           cursor: getCursor(activeToolID),
         }}
       />
-      {/*TODO: Спросить у Владислава Юрьевича, как можно сделать скролы */}
+
+      {/* Горизонтальный скролл */}
+      <div className={s.scrollTrackX}>
+        <div
+          className={s.scrollThumbX}
+          style={{
+            left: `max(calc(${scrollX * 100}% - ${thubnailSize}px), 0px)`,
+          }}
+          onMouseDown={(e) => startDragging(e, "x")}
+        />
+      </div>
+
+      {/* Вертикальный скролл */}
+      <div className={s.scrollTrackY}>
+        <div
+          className={s.scrollThumbY}
+          style={{
+            top: `max(calc(${scrollY * 100}% - ${thubnailSize}px), 0px)`,
+          }}
+          onMouseDown={(e) => startDragging(e, "y")}
+        />
+      </div>
     </div>
   );
 }

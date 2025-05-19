@@ -1,3 +1,8 @@
+// Полезные ссылки:
+// - https://horizon-lab.org/colorvis/xyz.html
+// - https://github.com/cangoektas/xyz-to-lab/blob/master/src/index.js
+// -
+
 // RGB 0–255 → 0–1
 export function srgbToLinear(value: number): number {
   const v = value / 255;
@@ -34,11 +39,43 @@ export function xyzToLab([x, y, z]: number[]): number[] {
   return [L, a, b];
 }
 
-// Lab → OKLch (упрощённо через Lab, реальный пересчёт через OKLab сложнее)
-export function labToLch([L, a, b]: number[]): number[] {
-  const C = Math.sqrt(a * a + b * b);
-  const h = Math.atan2(b, a) * (180 / Math.PI);
-  return [L, C, h < 0 ? h + 360 : h];
+type Oklch = {
+  l: number; // Lightness [0..1]
+  c: number; // Chroma (saturation)
+  h: number; // Hue [0..360]
+};
+
+export function rgbaToOklch(
+  r: number,
+  g: number,
+  b: number,
+  a: number = 1,
+): Oklch {
+  // Normalize to [0,1]
+  const rLin = srgbToLinear(r);
+  const gLin = srgbToLinear(g);
+  const bLin = srgbToLinear(b);
+
+  // Linear RGB → LMS (OKLab intermediate)
+  const l = 0.4122214708 * rLin + 0.5363325363 * gLin + 0.0514459929 * bLin;
+  const m = 0.2119034982 * rLin + 0.6806995451 * gLin + 0.1073969566 * bLin;
+  const s = 0.0883024619 * rLin + 0.2817188376 * gLin + 0.6299787005 * bLin;
+
+  const l_ = Math.cbrt(l);
+  const m_ = Math.cbrt(m);
+  const s_ = Math.cbrt(s);
+
+  // LMS → OKLab
+  const L = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_;
+  const A = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
+  const B = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
+
+  // OKLab → OKLCH
+  const C = Math.sqrt(A * A + B * B);
+  let H = Math.atan2(B, A) * (180 / Math.PI);
+  if (H < 0) H += 360;
+
+  return { l: L, c: C, h: H };
 }
 
 // WCAG контраст

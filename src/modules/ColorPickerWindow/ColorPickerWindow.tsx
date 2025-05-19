@@ -2,7 +2,7 @@ import { useColorPickerContext } from "../../contexts/ColorPickerContext/ColorPi
 import { useTool } from "../../contexts/ToolContext/ToolContext";
 import {
   getContrast,
-  labToLch,
+  rgbaToOklch,
   rgbToXyz,
   xyzToLab,
 } from "../../utils/colorSchemes";
@@ -17,7 +17,7 @@ export function ColorInfoPanel() {
   const renderColorSpaces = (label: string, color: number[]) => {
     const xyz = rgbToXyz(color);
     const lab = xyzToLab(xyz);
-    const lch = labToLch(lab);
+    const lch = rgbaToOklch(color[0], color[1], color[2], 1);
 
     return (
       <div className={s.colorInfo}>
@@ -30,7 +30,7 @@ export function ColorInfoPanel() {
           Lab: {lab.map((v) => format(v)).join(", ")}
         </div>
         <div title="OKLch: L (светлота), C (насыщенность), h (оттенок в градусах).">
-          OKLch: {lch.map((v) => format(v)).join(", ")}
+          OKLch: `{lch.l.toFixed(2)}, ${lch.c.toFixed(2)}, ${lch.h.toFixed(2)}`
         </div>
         <div
           className={s.colorPreview}
