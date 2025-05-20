@@ -94,7 +94,7 @@ function runColorConversionTests() {
     // Выполняем конвертации
     const actualXyz = rgbToXyz(rgbColor).map((n) => Math.round(n));
     const actualLab = xyzToLab(rgbToXyz(rgbColor)).map((n) => Math.round(n));
-    const actualOklch = rgbaToOklch(rgbColor[0], rgbColor[1], rgbColor[2], 1);
+    const actualOklch = rgbaToOklch(rgbColor[0], rgbColor[1], rgbColor[2]);
     const actualOklchArray = [actualOklch.l, actualOklch.c, actualOklch.h];
 
     // Проверяем результаты

@@ -7,7 +7,7 @@ import { InterpolationModal } from "./components/ImterpolationModal/Interpolatio
 
 export function ActionsMenu() {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { loadImage, clearImage, resizeImage } = useContext(ImageContext);
+  const { loadImage, clearImage } = useContext(ImageContext);
   const [isOpenInterpolation, setIsOpenInterpolation] = useState(false);
 
   function handleFileOpen() {

@@ -17,7 +17,7 @@ export function ColorInfoPanel() {
   const renderColorSpaces = (label: string, color: number[]) => {
     const xyz = rgbToXyz(color);
     const lab = xyzToLab(xyz);
-    const lch = rgbaToOklch(color[0], color[1], color[2], 1);
+    const lch = rgbaToOklch(color[0], color[1], color[2]);
 
     return (
       <div className={s.colorInfo}>

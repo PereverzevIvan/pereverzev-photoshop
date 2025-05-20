@@ -1,4 +1,4 @@
-import { detectImageFormat, SupportedImageFormat } from "./ImageTypeGetter";
+import { SupportedImageFormat } from "./ImageTypeGetter";
 
 export async function getColorDepthOfImage(
   file: File,

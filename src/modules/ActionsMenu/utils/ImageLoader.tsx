@@ -2,13 +2,13 @@ import { useContext, useRef } from "react";
 import { ImageContext } from "../../../contexts/ImageContext/ImageContext.tsx";
 
 type ImageLoaderReturn = {
-  input_ref: React.RefObject<null>;
+  input_ref: React.RefObject<HTMLInputElement | null>;
   handleFileChange: (event: any) => void;
   handleButtonClick: () => void;
 };
 
 export function ImageLoader(): ImageLoaderReturn {
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { loadImage } = useContext(ImageContext);
 
   function handleFileChange(event: any) {
@@ -19,6 +19,7 @@ export function ImageLoader(): ImageLoaderReturn {
   }
 
   function handleButtonClick() {
+    if (!inputRef.current) return;
     inputRef.current.click();
   }
 

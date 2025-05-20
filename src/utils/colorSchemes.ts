@@ -45,12 +45,7 @@ type Oklch = {
   h: number; // Hue [0..360]
 };
 
-export function rgbaToOklch(
-  r: number,
-  g: number,
-  b: number,
-  a: number = 1,
-): Oklch {
+export function rgbaToOklch(r: number, g: number, b: number): Oklch {
   // Normalize to [0,1]
   const rLin = srgbToLinear(r);
   const gLin = srgbToLinear(g);
