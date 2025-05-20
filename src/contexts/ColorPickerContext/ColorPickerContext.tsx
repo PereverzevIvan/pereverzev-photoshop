@@ -3,6 +3,10 @@ import { createContext, useContext, useState, useCallback } from "react";
 type ColorPickerContextType = {
   firstPickedColor: number[] | null;
   secondPickedColor: number[] | null;
+  firstPickedColorCoords: { x: number; y: number } | null;
+  secondPickedColorCoords: { x: number; y: number } | null;
+  setFirstPickedColorCoords: (coords: { x: number; y: number }) => void;
+  setSecondPickedColorCoords: (coords: { x: number; y: number }) => void;
   setFirstPickedColor: (color: number[]) => void;
   setSecondPickedColor: (color: number[]) => void;
   pickColorAt: (
@@ -28,6 +32,14 @@ export const ColorPickerProvider = ({
   const [secondPickedColor, setSecondPickedColor] = useState<number[] | null>(
     null,
   );
+  const [firstPickedColorCoords, setFirstPickedColorCoords] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [secondPickedColorCoords, setSecondPickedColorCoords] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const pickColorAt = useCallback(
     (
@@ -55,6 +67,10 @@ export const ColorPickerProvider = ({
       value={{
         firstPickedColor,
         secondPickedColor,
+        firstPickedColorCoords,
+        secondPickedColorCoords,
+        setFirstPickedColorCoords,
+        setSecondPickedColorCoords,
         setFirstPickedColor,
         setSecondPickedColor,
         pickColorAt,

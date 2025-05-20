@@ -21,7 +21,12 @@ export function CanvasModule() {
     scalledImageData,
   } = useImageContext();
   const { activeToolID } = useTool();
-  const { setFirstPickedColor, setSecondPickedColor } = useColorPickerContext();
+  const {
+    setFirstPickedColor,
+    setSecondPickedColor,
+    setFirstPickedColorCoords,
+    setSecondPickedColorCoords,
+  } = useColorPickerContext();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
@@ -125,14 +130,20 @@ export function CanvasModule() {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
+      const imageX = x - offsetX;
+      const imageY = y - offsetY;
+
       const pixel = ctx.getImageData(x, y, 1, 1).data;
       const [r, g, b, a] = pixel;
 
       if (e.button == 0) {
         if (e.ctrlKey) {
           setSecondPickedColor([r, g, b, a]);
+          setSecondPickedColorCoords({ x: imageX, y: imageY });
         } else {
           setFirstPickedColor([r, g, b, a]);
+          setFirstPickedColorCoords({ x: imageX, y: imageY });
         }
       }
     }

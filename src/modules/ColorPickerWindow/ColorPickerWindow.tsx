@@ -9,12 +9,21 @@ import {
 import s from "./ColorPickerWindow.module.scss";
 
 export function ColorInfoPanel() {
-  const { firstPickedColor, secondPickedColor } = useColorPickerContext();
+  const {
+    firstPickedColor,
+    secondPickedColor,
+    firstPickedColorCoords: firstCoords,
+    secondPickedColorCoords: secondCoords,
+  } = useColorPickerContext();
   const { activeToolID } = useTool();
 
   const format = (value: number, digits = 2) => value.toFixed(digits);
 
-  const renderColorSpaces = (label: string, color: number[]) => {
+  const renderColorSpaces = (
+    label: string,
+    color: number[],
+    coords: { x: number; y: number } | null,
+  ) => {
     const xyz = rgbToXyz(color);
     const lab = xyzToLab(xyz);
     const lch = rgbaToOklch(color[0], color[1], color[2]);
@@ -22,6 +31,9 @@ export function ColorInfoPanel() {
     return (
       <div className={s.colorInfo}>
         <div>{label}</div>
+        <div>
+          X: {coords && coords.x.toFixed(2)}, Y: {coords && coords.y.toFixed(2)}
+        </div>
         <div>RGB: {color.map((c) => Math.round(c)).join(", ")}</div>
         <div title="X, Y, Z — координаты цвета в пространстве XYZ. Y отвечает за яркость.">
           XYZ: {xyz.map((v) => format(v)).join(", ")}
@@ -30,7 +42,7 @@ export function ColorInfoPanel() {
           Lab: {lab.map((v) => format(v)).join(", ")}
         </div>
         <div title="OKLch: L (светлота), C (насыщенность), h (оттенок в градусах).">
-          OKLch: `{lch.l.toFixed(2)}, ${lch.c.toFixed(2)}, ${lch.h.toFixed(2)}`
+          OKLch: {lch.l.toFixed(2)}, {lch.c.toFixed(2)}, {lch.h.toFixed(2)}
         </div>
         <div
           className={s.colorPreview}
@@ -55,9 +67,10 @@ export function ColorInfoPanel() {
       style={{ display: activeToolID == 2 ? "flex" : "none" }}
     >
       <div className={s.colorInfoContainer}>
-        {firstPickedColor && renderColorSpaces("Первый цвет", firstPickedColor)}
+        {firstPickedColor &&
+          renderColorSpaces("Первый цвет", firstPickedColor, firstCoords)}
         {secondPickedColor &&
-          renderColorSpaces("Второй цвет", secondPickedColor)}
+          renderColorSpaces("Второй цвет", secondPickedColor, secondCoords)}
       </div>
       <p>{contrastText()}</p>
     </div>
